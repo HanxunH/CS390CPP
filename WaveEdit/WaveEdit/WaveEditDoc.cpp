@@ -17,6 +17,8 @@ IMPLEMENT_DYNCREATE(CWaveEditDoc, CDocument)
 BEGIN_MESSAGE_MAP(CWaveEditDoc, CDocument)
 	ON_COMMAND(ID_TOOLS_PLAY, &CWaveEditDoc::OnToolsPlay)
 	ON_COMMAND(ID_TOOLS_ECHO, &CWaveEditDoc::OnToolsEcho)
+	ON_COMMAND(ID_TOOLS_SPEEDUP, &CWaveEditDoc::OnToolsSpeedup)
+	ON_COMMAND(ID_TOOLS_SLOWDOWN, &CWaveEditDoc::OnToolsSlowdown)
 END_MESSAGE_MAP()
 
 
@@ -82,16 +84,34 @@ void CWaveEditDoc::Dump(CDumpContext& dc) const
 
 void CWaveEditDoc::OnToolsPlay()
 {
-	// TODO: 在此添加命令处理程序代码
+	// TODO:
 	wave.play();
 }
 
 void CWaveEditDoc::OnToolsEcho()
 {
-	// TODO: 在此添加命令处理程序代码
-	float attenuation = .2;
+	// TODO:
+	float attenuation = .5;
 	float delay = 100; // In MS
 
 	wave = *(wave.echo(attenuation, delay));
 	wave.updateHeader();
+	wave.play();
+}
+
+void CWaveEditDoc::OnToolsSpeedup()
+{
+	// TODO:
+	wave = *(wave.changeSpeed(2));
+	wave.updateHeader();
+	wave.play();
+}
+
+void CWaveEditDoc::OnToolsSlowdown()
+{
+	// TODO:
+
+	wave = *(wave.changeSpeed(0.5));
+	wave.updateHeader();
+	wave.play();
 }

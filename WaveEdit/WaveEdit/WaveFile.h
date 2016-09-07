@@ -30,6 +30,7 @@ typedef struct WaveHeader {
 } WaveHeader;
 class WaveFile
 {
+        friend class CWaveEditView ;
         unsigned long numChannels;
         unsigned long sampleRate;
         unsigned long bitsPerSample;
@@ -72,4 +73,5 @@ public:
         // echoAmount is a constant 0 to 1 with the amount of echo
         // delayms is the delay of the echo added to the original.
         WaveFile * echo(float echoAmount, float delayms);
+		    WaveFile * changeSpeed(float speed);
 };

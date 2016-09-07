@@ -152,4 +152,3 @@ void CWaveEditApp::OnAppAbout()
 
 
 // CWaveEditApp message handlers
-

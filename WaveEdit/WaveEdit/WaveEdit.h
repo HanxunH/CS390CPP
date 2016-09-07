@@ -26,6 +26,7 @@ public:
 // Implementation
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
+
 };
 
 extern CWaveEditApp theApp;

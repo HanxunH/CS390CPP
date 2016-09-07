@@ -49,7 +49,7 @@ WaveFile::WaveFile(void)
         hdr = NULL;
 }
 // Create an empty wave file with these parameters.
-WaveFile::WaveFile( int numChannels, int sampleRate, int bitsPerSample) {    
+WaveFile::WaveFile( int numChannels, int sampleRate, int bitsPerSample) {
         this->numChannels = numChannels;
         this->sampleRate = sampleRate;
         this->bitsPerSample = bitsPerSample;
@@ -77,7 +77,7 @@ WaveFile::read(CFile * f)
         }
         // Allocate memory for wave file
         hdr = (WaveHeader *) malloc(fsize+1);
-   
+
         // Read file
         f->Read( hdr, fsize);
         // Validate that this is 16bit wav file with no compression
@@ -254,4 +254,17 @@ WaveFile::echo(float echoAmount, float delayms)
         }
         w2->updateHeader();
         return w2;
+}
+
+WaveFile *
+WaveFile::changeSpeed(float speed){
+	WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
+	float index = 0;
+
+	while(index < lastSample){
+	  newWave->add_sample(get_sample((int)index));
+		index = index + speed;
+	}
+	newWave->updateHeader();
+	return newWave;
 }
