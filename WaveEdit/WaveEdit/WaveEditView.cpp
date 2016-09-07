@@ -24,6 +24,9 @@ BEGIN_MESSAGE_MAP(CWaveEditView, CView)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
+	ON_COMMAND(ID_EDIT_COPY, &CWaveEditView::OnEditCopy)
+	ON_COMMAND(ID_EDIT_CUT, &CWaveEditView::OnEditCut)
+	ON_COMMAND(ID_EDIT_PASTE, &CWaveEditView::OnEditPaste)
 END_MESSAGE_MAP()
 
 // CWaveEditView construction/destruction
@@ -176,4 +179,19 @@ void CWaveEditView::OnMouseMove(UINT nFlags, CPoint point)
 				selectionEnd = point.x;
 				RedrawWindow();
 	}
+}
+
+void CWaveEditView::OnEditCopy()
+{
+	// TODO:
+}
+
+void CWaveEditView::OnEditCut()
+{
+	// TODO:
+}
+
+void CWaveEditView::OnEditPaste()
+{
+	// TODO:
 }
