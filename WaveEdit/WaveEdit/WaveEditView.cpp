@@ -189,7 +189,36 @@ void CWaveEditView::OnEditCopy()
 void CWaveEditView::OnEditCut()
 {
 	// TODO:
+	CWaveEditDoc* pDoc = GetDocument();
 
+        ASSERT_VALID(pDoc);
+        if (!pDoc)
+                return;
+        WaveFile * wave = &pDoc->wave;
+        if (wave->hdr==NULL) {
+                return;
+        }
+        // Get dimensions of the window.
+        CRect rect;
+        GetClientRect(rect);
+        // Scale the start and end of the selection.
+        double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/rect.Width();
+        // Scale the start and end of the selection.
+        double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/rect.Width();
+
+        // Copy first the fragment
+
+				CWaveEditApp* app = dynamic_cast<CWaveEditApp*>(AfxGetApp());
+				app->clipboard = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
+        app->clipboard = wave->get_fragment(startms, endms);
+        // Copy the clipboard
+        WaveFile * w2 = wave->remove_fragment(startms, endms);
+        // Remove old wave
+        delete wave;
+        // Substitute old wave with new one
+        pDoc->wave = *w2;
+        // Update window
+        this->RedrawWindow();
 }
 
 void CWaveEditView::OnEditPaste()

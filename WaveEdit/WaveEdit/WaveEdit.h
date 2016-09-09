@@ -16,8 +16,12 @@
 
 class CWaveEditApp : public CWinApp
 {
+	friend class WaveFile;
+
 public:
 	CWaveEditApp();
+	WaveFile * clipboard;
+
 // Overrides
 public:
 	virtual BOOL InitInstance();
