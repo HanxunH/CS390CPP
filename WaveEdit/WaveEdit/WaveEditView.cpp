@@ -189,6 +189,7 @@ void CWaveEditView::OnEditCopy()
 void CWaveEditView::OnEditCut()
 {
 	// TODO:
+
 }
 
 void CWaveEditView::OnEditPaste()

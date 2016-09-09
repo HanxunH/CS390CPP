@@ -260,11 +260,42 @@ WaveFile *
 WaveFile::changeSpeed(float speed){
 	WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
 	float index = 0;
-
 	while(index < lastSample){
 	  newWave->add_sample(get_sample((int)index));
 		index = index + speed;
 	}
 	newWave->updateHeader();
+	return newWave;
+}
+
+WaveFile *
+WaveFile::get_fragment(int startMs, int endMs)
+{
+	//TODO:
+	WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
+  int sampleSec = this->sampleRate/1000;
+  int i = startMs * sampleSec;
+  while(i<endMs*sampleSec){
+    newWave->add_sample(this->get_sample(i++));
+  }
+	newWave->updateHeader();
+	return newWave;
+}
+
+WaveFile *
+WaveFile::remove_fragment(int startMs, int endMs)
+{
+	WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
+  int sampleSec = this->sampleRate/1000;
+  int start = startMs * sampleSec;
+  int end = endMs * sampleSec;
+  int i = 0;
+  while(i<startMs){
+    newWave->add_sample(this->get_sample(i++));
+  }
+  i = end;
+  while(i<this->lastSample){
+    newWave->add_sample(this->get_sample(i++));
+  }
 	return newWave;
 }

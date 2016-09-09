@@ -7,6 +7,8 @@
 
 class CWaveEditView : public CScrollView
 {
+	friend class CWaveEditDoc;
+
 protected: // create from serialization only
 	CWaveEditView();
 	DECLARE_DYNCREATE(CWaveEditView)
@@ -24,11 +26,11 @@ public:
 public:
 	virtual void OnDraw(CDC* pDC);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual void OnInitialUpdate();
 protected:
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
-	virtual void OnInitialUpdate();
 // Implementation
 public:
 	virtual ~CWaveEditView();

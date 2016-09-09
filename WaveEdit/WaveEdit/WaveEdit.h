@@ -9,6 +9,7 @@
 #include "resource.h"       // main symbols
 
 
+
 // CWaveEditApp:
 // See WaveEdit.cpp for the implementation of this class
 //
@@ -17,8 +18,6 @@ class CWaveEditApp : public CWinApp
 {
 public:
 	CWaveEditApp();
-
-
 // Overrides
 public:
 	virtual BOOL InitInstance();
