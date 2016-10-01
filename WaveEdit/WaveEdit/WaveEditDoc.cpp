@@ -85,6 +85,7 @@ void CWaveEditDoc::Dump(CDumpContext& dc) const
 void CWaveEditDoc::OnToolsPlay()
 {
 	// TODO:
+	wave.updateHeader();
 	wave.play();
 }
 

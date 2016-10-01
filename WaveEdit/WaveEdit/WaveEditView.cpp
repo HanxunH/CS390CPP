@@ -11,7 +11,6 @@
 #define new DEBUG_NEW
 #endif
 
-
 // CWaveEditView
 
 IMPLEMENT_DYNCREATE(CWaveEditView, CView)
@@ -184,6 +183,27 @@ void CWaveEditView::OnMouseMove(UINT nFlags, CPoint point)
 void CWaveEditView::OnEditCopy()
 {
 	// TODO:
+	CWaveEditDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+	WaveFile * wave = &pDoc->wave;
+	if (wave->hdr==NULL) {
+		return;
+	}
+	CRect rect;
+	GetClientRect(rect);
+	// Scale the start and end of the selection.
+	double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/rect.Width();
+	// Scale the start and end of the selection.
+	double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/rect.Width();
+	CWaveEditApp* app = dynamic_cast<CWaveEditApp*>(AfxGetApp());
+	app->clipboard = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
+	app->clipboard = wave->get_fragment(startms, endms);
+	// Update window
+	selectionStart = 0;
+	selectionEnd = 0;
+	this->RedrawWindow();
 }
 
 void CWaveEditView::OnEditCut()
@@ -214,14 +234,38 @@ void CWaveEditView::OnEditCut()
         // Copy the clipboard
         WaveFile * w2 = wave->remove_fragment(startms, endms);
         // Remove old wave
-        delete wave;
+        //delete wave;
         // Substitute old wave with new one
         pDoc->wave = *w2;
         // Update window
+				selectionStart = 0;
+				selectionEnd = 0;
         this->RedrawWindow();
 }
 
 void CWaveEditView::OnEditPaste()
 {
 	// TODO:
+	CWaveEditApp* app = dynamic_cast<CWaveEditApp*>(AfxGetApp());
+	if(app->clipboard==NULL){
+		TRACE("OnEditPaste() empty clipboard");
+		return;
+	}
+	CWaveEditDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	WaveFile * wave = &pDoc->wave;
+	if (wave->hdr==NULL) {
+		return;
+	}
+
+	CRect rect;
+	GetClientRect(rect);
+	int startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/rect.Width();
+	WaveFile * w2 = wave->add_fragment(startms, app->clipboard);
+	pDoc->wave = *w2;
+	wave->updateHeader();
+	this->RedrawWindow();
 }
