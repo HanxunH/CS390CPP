@@ -173,6 +173,8 @@ BEGIN
     BEGIN
         MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM "Zoom In",                     ID_VIEW_ZOOMIN
+        MENUITEM "Zoom Out",                    ID_VIEW_ZOOMOUT
     END
     POPUP "&Window"
     BEGIN

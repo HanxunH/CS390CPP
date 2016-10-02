@@ -19,7 +19,7 @@ public:
 	bool mousePressed;
 	int selectionStart; // Selected sample start
 	int selectionEnd; // Selected sample end
-
+	double scaleNumber;
 public:
 
 // Overrides
@@ -51,6 +51,8 @@ public:
 	afx_msg void OnEditCopy();
 	afx_msg void OnEditCut();
 	afx_msg void OnEditPaste();
+	afx_msg void OnViewZoomin();
+	afx_msg void OnViewZoomout();
 };
 
 #ifndef _DEBUG  // debug version in WaveEditView.cpp

@@ -318,5 +318,4 @@ WaveFile::add_fragment(int startMs, WaveFile* base_file)
     newWave->add_sample(this->get_sample(i++));
   }
   return newWave;
-
 }

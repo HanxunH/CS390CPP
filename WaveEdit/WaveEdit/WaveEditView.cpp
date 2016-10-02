@@ -13,19 +13,21 @@
 
 // CWaveEditView
 
-IMPLEMENT_DYNCREATE(CWaveEditView, CView)
+IMPLEMENT_DYNCREATE(CWaveEditView, CScrollView)
 
-BEGIN_MESSAGE_MAP(CWaveEditView, CView)
+BEGIN_MESSAGE_MAP(CWaveEditView, CScrollView)
 	// Standard printing commands
-	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
+	ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CScrollView::OnFilePrintPreview)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
 	ON_COMMAND(ID_EDIT_COPY, &CWaveEditView::OnEditCopy)
 	ON_COMMAND(ID_EDIT_CUT, &CWaveEditView::OnEditCut)
 	ON_COMMAND(ID_EDIT_PASTE, &CWaveEditView::OnEditPaste)
+	ON_COMMAND(ID_VIEW_ZOOMIN, &CWaveEditView::OnViewZoomin)
+	ON_COMMAND(ID_VIEW_ZOOMOUT, &CWaveEditView::OnViewZoomout)
 END_MESSAGE_MAP()
 
 // CWaveEditView construction/destruction
@@ -36,6 +38,7 @@ CWaveEditView::CWaveEditView()
 	mousePressed = false;
 	selectionStart = 0;
 	selectionEnd = 0;
+	scaleNumber = 1;
 }
 
 CWaveEditView::~CWaveEditView()
@@ -52,6 +55,9 @@ BOOL CWaveEditView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CWaveEditView drawing
 
+int helper_width(unsigned int maxSamples,unsigned long sampleRate, int scaleNumber){
+	return (maxSamples/sampleRate)*scaleNumber;
+}
 
 void CWaveEditView::OnDraw(CDC* pDC)
 {
@@ -89,16 +95,21 @@ void CWaveEditView::OnDraw(CDC* pDC)
 	// Draw the wave
 	pDC->MoveTo(0,0);
 	int x;
-	for (x=0; x < rect.Width(); x++) {
+	for (x=0; x < rect.Width()*scaleNumber; x++) {
 					// Assuming the whole file will be fit in the window, for every x value in the window
 					// we need to find the equivalent sample in the wave file.
-					float val = wave->get_sample((int) (x*wave->lastSample/rect.Width()) );
+					float val = wave->get_sample((int) (x*wave->lastSample/(rect.Width()*scaleNumber)) );
 					// We need to fit the sound also in the y axis. The y axis goes from 0 in the
 					// top of the window to rect.Height at the bottom. The sound goes from -32768 to 32767
 					// we scale it in that way.
 					int y = (int) ((val+32768) * (rect.Height()-1) / (32767+32768));
 					pDC->LineTo(x,rect.Height() - y);
 	}
+	CSize sizeTotal;
+	// TODO: calculate the total size of this view
+	sizeTotal.cx = x;
+	sizeTotal.cy = 0;
+	SetScrollSizes(MM_TEXT, sizeTotal);
 }
 
 
@@ -127,7 +138,7 @@ CWaveEditView::OnInitialUpdate()
         // Initial scroll sizes
         CSize sizeTotal;
         sizeTotal.cx = 10000;
-        sizeTotal.cy = 10000;
+        sizeTotal.cy = 0;
         SetScrollSizes(MM_TEXT, sizeTotal);
 }
 
@@ -157,15 +168,21 @@ CWaveEditDoc* CWaveEditView::GetDocument() const // non-debug version is inline
 void CWaveEditView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	mousePressed = true;
-	selectionStart = point.x;
-	selectionEnd = point.x;
+	selectionStart = point.x + GetScrollPosition().x;
+	selectionEnd = point.x + GetScrollPosition().x;
 	CScrollView::OnLButtonDown(nFlags, point);
 }
 
 void CWaveEditView::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	mousePressed = false;
-	this->selectionEnd = point.x;
+	this->selectionEnd = point.x + GetScrollPosition().x;
+	if(this->selectionEnd < this->selectionStart){
+		//swap
+		int temp = this->selectionEnd;
+		this->selectionEnd = this->selectionStart;
+		this->selectionStart = temp;
+	}
 	this->RedrawWindow();
 	CScrollView::OnLButtonUp(nFlags, point);
 }
@@ -175,7 +192,7 @@ void CWaveEditView::OnMouseMove(UINT nFlags, CPoint point)
 
 	CScrollView::OnMouseMove(nFlags, point);
 	if (mousePressed) {
-				selectionEnd = point.x;
+				selectionEnd = point.x + GetScrollPosition().x;
 				RedrawWindow();
 	}
 }
@@ -194,9 +211,9 @@ void CWaveEditView::OnEditCopy()
 	CRect rect;
 	GetClientRect(rect);
 	// Scale the start and end of the selection.
-	double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/rect.Width();
+	double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
 	// Scale the start and end of the selection.
-	double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/rect.Width();
+	double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/(rect.Width()*scaleNumber);
 	CWaveEditApp* app = dynamic_cast<CWaveEditApp*>(AfxGetApp());
 	app->clipboard = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
 	app->clipboard = wave->get_fragment(startms, endms);
@@ -222,9 +239,9 @@ void CWaveEditView::OnEditCut()
         CRect rect;
         GetClientRect(rect);
         // Scale the start and end of the selection.
-        double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/rect.Width();
+        double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
         // Scale the start and end of the selection.
-        double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/rect.Width();
+        double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/(rect.Width()*scaleNumber);
 
         // Copy first the fragment
 
@@ -263,9 +280,23 @@ void CWaveEditView::OnEditPaste()
 
 	CRect rect;
 	GetClientRect(rect);
-	int startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/rect.Width();
+	int startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
 	WaveFile * w2 = wave->add_fragment(startms, app->clipboard);
 	pDoc->wave = *w2;
 	wave->updateHeader();
+	this->RedrawWindow();
+}
+
+void CWaveEditView::OnViewZoomin()
+{
+	// TODO:
+	scaleNumber = scaleNumber*2;
+	this->RedrawWindow();
+}
+
+void CWaveEditView::OnViewZoomout()
+{
+	// TODO:
+	scaleNumber = scaleNumber/2;
 	this->RedrawWindow();
 }
