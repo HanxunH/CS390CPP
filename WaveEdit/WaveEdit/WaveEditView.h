@@ -3,6 +3,7 @@
 
 
 #pragma once
+#include <stack>
 
 
 class CWaveEditView : public CScrollView
@@ -20,6 +21,8 @@ public:
 	int selectionStart; // Selected sample start
 	int selectionEnd; // Selected sample end
 	double scaleNumber;
+	std::stack<WaveFile> Stack_redo;
+	std::stack<WaveFile> Stack_undo;
 public:
 
 // Overrides
@@ -53,6 +56,8 @@ public:
 	afx_msg void OnEditPaste();
 	afx_msg void OnViewZoomin();
 	afx_msg void OnViewZoomout();
+	afx_msg void OnEditRedo();
+	afx_msg void OnEditUndo();
 };
 
 #ifndef _DEBUG  // debug version in WaveEditView.cpp

@@ -28,6 +28,8 @@ BEGIN_MESSAGE_MAP(CWaveEditView, CScrollView)
 	ON_COMMAND(ID_EDIT_PASTE, &CWaveEditView::OnEditPaste)
 	ON_COMMAND(ID_VIEW_ZOOMIN, &CWaveEditView::OnViewZoomin)
 	ON_COMMAND(ID_VIEW_ZOOMOUT, &CWaveEditView::OnViewZoomout)
+	ON_COMMAND(ID_EDIT_REDO, &CWaveEditView::OnEditRedo)
+	ON_COMMAND(ID_EDIT_UNDO, &CWaveEditView::OnEditUndo)
 END_MESSAGE_MAP()
 
 // CWaveEditView construction/destruction
@@ -41,9 +43,19 @@ CWaveEditView::CWaveEditView()
 	scaleNumber = 1;
 }
 
+
+void emptyStack(std::stack<WaveFile> &stack){
+	while (stack.empty() != true) {
+		stack.pop();
+	}
+}
+
 CWaveEditView::~CWaveEditView()
 {
+	emptyStack(Stack_redo);
+	emptyStack(Stack_undo);
 }
+
 
 BOOL CWaveEditView::PreCreateWindow(CREATESTRUCT& cs)
 {
@@ -210,6 +222,8 @@ void CWaveEditView::OnEditCopy()
 	}
 	CRect rect;
 	GetClientRect(rect);
+	Stack_undo.push(*wave);
+	emptyStack(Stack_redo);
 	// Scale the start and end of the selection.
 	double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
 	// Scale the start and end of the selection.
@@ -238,6 +252,8 @@ void CWaveEditView::OnEditCut()
         // Get dimensions of the window.
         CRect rect;
         GetClientRect(rect);
+				Stack_undo.push(*wave);
+				emptyStack(Stack_redo);
         // Scale the start and end of the selection.
         double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
         // Scale the start and end of the selection.
@@ -280,6 +296,8 @@ void CWaveEditView::OnEditPaste()
 
 	CRect rect;
 	GetClientRect(rect);
+	Stack_undo.push(*wave);
+	emptyStack(Stack_redo);
 	int startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
 	WaveFile * w2 = wave->add_fragment(startms, app->clipboard);
 	pDoc->wave = *w2;
@@ -298,5 +316,33 @@ void CWaveEditView::OnViewZoomout()
 {
 	// TODO:
 	scaleNumber = scaleNumber/2;
+	this->RedrawWindow();
+}
+
+void CWaveEditView::OnEditRedo()
+{
+	// TODO:
+	if(Stack_redo.empty()){
+		return;
+	}
+	CWaveEditDoc* pDoc = GetDocument();
+	Stack_undo.push(pDoc->wave);
+	pDoc->wave = Stack_redo.top();
+	pDoc->wave.updateHeader();
+	Stack_redo.pop();
+	this->RedrawWindow();
+}
+
+void CWaveEditView::OnEditUndo()
+{
+	// TODO:
+	if(Stack_undo.empty()){
+		return;
+	}
+	CWaveEditDoc* pDoc = GetDocument();
+	Stack_redo.push(pDoc->wave);
+	pDoc->wave = Stack_undo.top();
+	pDoc->wave.updateHeader();
+	Stack_undo.pop();
 	this->RedrawWindow();
 }
