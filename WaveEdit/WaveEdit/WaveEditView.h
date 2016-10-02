@@ -58,6 +58,9 @@ public:
 	afx_msg void OnViewZoomout();
 	afx_msg void OnEditRedo();
 	afx_msg void OnEditUndo();
+	afx_msg void OnToolsSpeedup();
+	afx_msg void OnToolsSlowdown();
+	afx_msg void OnToolsEcho();
 };
 
 #ifndef _DEBUG  // debug version in WaveEditView.cpp

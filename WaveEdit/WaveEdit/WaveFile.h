@@ -77,5 +77,6 @@ public:
         WaveFile * get_fragment(int startMs, int endMs);
         WaveFile * remove_fragment(int startMs, int endMs);
         WaveFile * add_fragment(int startMs, WaveFile* base_file);
+        WaveFile * update_fragment(int startMs, int endMs, WaveFile* base_file);
 
 };

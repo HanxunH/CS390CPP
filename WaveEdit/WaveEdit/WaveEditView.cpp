@@ -30,6 +30,9 @@ BEGIN_MESSAGE_MAP(CWaveEditView, CScrollView)
 	ON_COMMAND(ID_VIEW_ZOOMOUT, &CWaveEditView::OnViewZoomout)
 	ON_COMMAND(ID_EDIT_REDO, &CWaveEditView::OnEditRedo)
 	ON_COMMAND(ID_EDIT_UNDO, &CWaveEditView::OnEditUndo)
+	ON_COMMAND(ID_TOOLS_SPEEDUP, &CWaveEditView::OnToolsSpeedup)
+	ON_COMMAND(ID_TOOLS_SLOWDOWN, &CWaveEditView::OnToolsSlowdown)
+	ON_COMMAND(ID_TOOLS_ECHO, &CWaveEditView::OnToolsEcho)
 END_MESSAGE_MAP()
 
 // CWaveEditView construction/destruction
@@ -322,27 +325,162 @@ void CWaveEditView::OnViewZoomout()
 void CWaveEditView::OnEditRedo()
 {
 	// TODO:
+	CWaveEditDoc* pDoc = GetDocument();
 	if(Stack_redo.empty()){
 		return;
 	}
-	CWaveEditDoc* pDoc = GetDocument();
 	Stack_undo.push(pDoc->wave);
 	pDoc->wave = Stack_redo.top();
-	pDoc->wave.updateHeader();
 	Stack_redo.pop();
+	pDoc->wave.updateHeader();
 	this->RedrawWindow();
 }
 
 void CWaveEditView::OnEditUndo()
 {
 	// TODO:
+	CWaveEditDoc* pDoc = GetDocument();
 	if(Stack_undo.empty()){
 		return;
 	}
-	CWaveEditDoc* pDoc = GetDocument();
 	Stack_redo.push(pDoc->wave);
 	pDoc->wave = Stack_undo.top();
-	pDoc->wave.updateHeader();
 	Stack_undo.pop();
+	pDoc->wave.updateHeader();
 	this->RedrawWindow();
+}
+
+void CWaveEditView::OnToolsSpeedup()
+{
+	// TODO:
+	CWaveEditDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+	WaveFile * wave = &pDoc->wave;
+	if (wave->hdr==NULL) {
+		return;
+	}
+	// Get dimensions of the window.
+	CRect rect;
+	GetClientRect(rect);
+	double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
+	double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/(rect.Width()*scaleNumber);
+	Stack_undo.push(*wave);
+	emptyStack(Stack_redo);
+
+
+	if(startms==endms){
+		TRACE("OnToolsSpeedup() no selection\n");
+		wave = wave->changeSpeed(2);
+		wave->updateHeader();
+		pDoc->wave = *wave;
+		pDoc->wave.play();
+		this->RedrawWindow();
+		return;
+	}
+	WaveFile * targetWaveFile = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
+	targetWaveFile = wave->get_fragment(startms,endms);
+	targetWaveFile->updateHeader();
+	WaveFile * w2 = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
+	w2 = wave->remove_fragment(startms,endms);
+	w2->updateHeader();
+	targetWaveFile = targetWaveFile->changeSpeed(2);
+	targetWaveFile->updateHeader();
+	w2 = w2->add_fragment(startms,targetWaveFile);
+	w2->updateHeader();
+	pDoc->wave = *w2;
+	pDoc->wave.play();
+	this->RedrawWindow();
+	return;
+}
+
+void CWaveEditView::OnToolsSlowdown()
+{
+	// TODO:
+	CWaveEditDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+	WaveFile * wave = &pDoc->wave;
+	if (wave->hdr==NULL) {
+		return;
+	}
+	// Get dimensions of the window.
+	CRect rect;
+	GetClientRect(rect);
+	double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
+	double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/(rect.Width()*scaleNumber);
+	Stack_undo.push(*wave);
+	emptyStack(Stack_redo);
+
+
+	if(startms==endms){
+		TRACE("OnToolsSlowdown() no selection\n");
+		wave = wave->changeSpeed(0.5);
+		wave->updateHeader();
+		pDoc->wave = *wave;
+		pDoc->wave.play();
+		this->RedrawWindow();
+		return;
+	}
+	WaveFile * targetWaveFile = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
+	targetWaveFile = wave->get_fragment(startms,endms);
+	targetWaveFile->updateHeader();
+	WaveFile * w2 = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
+	w2 = wave->remove_fragment(startms,endms);
+	w2->updateHeader();
+	targetWaveFile = targetWaveFile->changeSpeed(0.5);
+	targetWaveFile->updateHeader();
+	w2 = w2->add_fragment(startms,targetWaveFile);
+	w2->updateHeader();
+	pDoc->wave = *w2;
+	pDoc->wave.play();
+	this->RedrawWindow();
+	return;
+}
+
+void CWaveEditView::OnToolsEcho()
+{
+	// TODO:
+	CWaveEditDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+  if (!pDoc)
+    return;
+  WaveFile * wave = &pDoc->wave;
+  if (wave->hdr==NULL) {
+    return;
+  }
+  // Get dimensions of the window.
+  CRect rect;
+  GetClientRect(rect);
+	float attenuation = .5;
+	float delay = 100; // In MS
+	double startms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionStart/(rect.Width()*scaleNumber);
+	double endms = (1000.0 * wave->lastSample /wave->sampleRate) * this->selectionEnd/(rect.Width()*scaleNumber);
+	Stack_undo.push(*wave);
+	emptyStack(Stack_redo);
+	if(startms==endms){
+		TRACE("OnToolsEcho() no selection\n");
+		wave = wave->echo(attenuation, delay);
+		wave->updateHeader();
+		pDoc->wave = *wave;
+		pDoc->wave.play();
+		this->RedrawWindow();
+		return;
+	}
+	WaveFile * targetWaveFile = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
+	targetWaveFile = wave->get_fragment(startms,endms);
+	targetWaveFile->updateHeader();
+	WaveFile * w2 = new WaveFile(wave->numChannels, wave->sampleRate, wave->bitsPerSample);
+	w2 = wave->remove_fragment(startms,endms);
+	w2->updateHeader();
+	targetWaveFile = targetWaveFile->echo(attenuation, delay);
+	targetWaveFile->updateHeader();
+	w2 = w2->add_fragment(startms,targetWaveFile);
+	w2->updateHeader();
+	pDoc->wave = *w2;
+	pDoc->wave.play();
+	this->RedrawWindow();
+	return;
 }

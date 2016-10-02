@@ -319,3 +319,11 @@ WaveFile::add_fragment(int startMs, WaveFile* base_file)
   }
   return newWave;
 }
+
+WaveFile *
+WaveFile::update_fragment(int startMs, int endMs, WaveFile* base_file)
+{
+  WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
+  return newWave;
+
+}

@@ -92,27 +92,28 @@ void CWaveEditDoc::OnToolsPlay()
 void CWaveEditDoc::OnToolsEcho()
 {
 	// TODO:
+	/*
 	float attenuation = .5;
 	float delay = 100; // In MS
-
+	TRACE("CWaveEditDoc()");
 	wave = *(wave.echo(attenuation, delay));
 	wave.updateHeader();
-	wave.play();
+	wave.play();*/
 }
 
 void CWaveEditDoc::OnToolsSpeedup()
 {
 	// TODO:
-	wave = *(wave.changeSpeed(2));
+	/*wave = *(wave.changeSpeed(2));
 	wave.updateHeader();
-	wave.play();
+	wave.play();*/
 }
 
 void CWaveEditDoc::OnToolsSlowdown()
 {
 	// TODO:
 
-	wave = *(wave.changeSpeed(0.5));
+	/*wave = *(wave.changeSpeed(0.5));
 	wave.updateHeader();
-	wave.play();
+	wave.play();*/
 }
