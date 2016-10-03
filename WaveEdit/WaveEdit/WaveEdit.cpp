@@ -8,7 +8,7 @@
 #include "ChildFrm.h"
 #include "WaveEditDoc.h"
 #include "WaveEditView.h"
-
+#include "FilterManager.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -105,6 +105,7 @@ BOOL CWaveEditApp::InitInstance()
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
 	// The main window has been initialized, so show and update it
+	fm = new FilterManager();
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
 

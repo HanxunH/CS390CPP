@@ -8,6 +8,7 @@
 
 #include "resource.h"       // main symbols
 
+#include "FilterManager.h"
 
 
 // CWaveEditApp:
@@ -17,11 +18,11 @@
 class CWaveEditApp : public CWinApp
 {
 	friend class WaveFile;
-
+	friend class WaveEditView;
 public:
 	CWaveEditApp();
 	WaveFile * clipboard;
-
+	FilterManager * fm;
 // Overrides
 public:
 	virtual BOOL InitInstance();

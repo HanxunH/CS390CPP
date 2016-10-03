@@ -191,6 +191,26 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Filter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterEcho.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterSlowdown.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterSpeedup.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MainFrm.cpp"
 				>
 			</File>
@@ -238,6 +258,26 @@
 			>
 			<File
 				RelativePath=".\ChildFrm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Filter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterEcho.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterSlowdown.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterSpeedup.h"
 				>
 			</File>
 			<File

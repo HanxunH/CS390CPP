@@ -61,6 +61,7 @@ public:
 	afx_msg void OnToolsSpeedup();
 	afx_msg void OnToolsSlowdown();
 	afx_msg void OnToolsEcho();
+	afx_msg void FilterManagerHandler(UINT nID);
 };
 
 #ifndef _DEBUG  // debug version in WaveEditView.cpp

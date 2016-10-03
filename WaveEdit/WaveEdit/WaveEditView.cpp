@@ -3,13 +3,16 @@
 
 #include "stdafx.h"
 #include "WaveEdit.h"
-
+#include "FilterManager.h"
 #include "WaveEditDoc.h"
 #include "WaveEditView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+#define ID_FILTER_START 7000
+#define ID_FILTER_END 7010
 
 // CWaveEditView
 
@@ -33,6 +36,7 @@ BEGIN_MESSAGE_MAP(CWaveEditView, CScrollView)
 	ON_COMMAND(ID_TOOLS_SPEEDUP, &CWaveEditView::OnToolsSpeedup)
 	ON_COMMAND(ID_TOOLS_SLOWDOWN, &CWaveEditView::OnToolsSlowdown)
 	ON_COMMAND(ID_TOOLS_ECHO, &CWaveEditView::OnToolsEcho)
+	ON_COMMAND_RANGE(ID_FILTER_START, ID_FILTER_END, &CWaveEditView::FilterManagerHandler)
 END_MESSAGE_MAP()
 
 // CWaveEditView construction/destruction
@@ -483,4 +487,26 @@ void CWaveEditView::OnToolsEcho()
 	pDoc->wave.play();
 	this->RedrawWindow();
 	return;
+}
+
+void CWaveEditView::FilterManagerHandler(UINT nID){
+	CWaveEditDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+  if (!pDoc)
+    return;
+  WaveFile * wave = &pDoc->wave;
+  if (wave->hdr==NULL) {
+    return;
+  }
+  // Get dimensions of the window.
+  CRect rect;
+  GetClientRect(rect);
+	Stack_undo.push(*wave);
+	emptyStack(Stack_redo);
+	CWaveEditApp* app = dynamic_cast<CWaveEditApp*>(AfxGetApp());
+	WaveFile* w2 = app->fm->getFilter(nID,wave);
+	w2->updateHeader();
+	pDoc->wave = *w2;
+	pDoc->wave.play();
+	this->RedrawWindow();
 }

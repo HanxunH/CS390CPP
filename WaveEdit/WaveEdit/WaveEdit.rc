@@ -195,7 +195,6 @@ BEGIN
         MENUITEM "Slow Down",                   ID_TOOLS_SLOWDOWN
         MENUITEM "Echo",                        ID_TOOLS_ECHO
     END
-    MENUITEM "Filter",                      0
 END
 
 
