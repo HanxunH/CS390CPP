@@ -285,16 +285,16 @@ WaveFile::get_fragment(int startMs, int endMs)
 WaveFile *
 WaveFile::remove_fragment(int startMs, int endMs)
 {
-	WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
+  WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
+  int i = 0;
   int sampleSec = this->sampleRate/1000;
   int start = startMs * sampleSec;
   int end = endMs * sampleSec;
-  int i = 0;
-  while(i<startMs){
+  while(i<start){
     newWave->add_sample(this->get_sample(i++));
   }
   i = end;
-  while(i <this->lastSample){
+  while(i<this->lastSample){
     newWave->add_sample(this->get_sample(i++));
   }
 	return newWave;
@@ -314,6 +314,28 @@ WaveFile::add_fragment(int startMs, WaveFile* base_file)
   while(ni < base_file->lastSample){
     newWave->add_sample(base_file->get_sample(ni++));
   }
+  while(i<this->lastSample){
+    newWave->add_sample(this->get_sample(i++));
+  }
+  return newWave;
+}
+
+WaveFile *
+WaveFile::replace_fragment(int startMs, int endMs, WaveFile* base_file)
+{
+  WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
+  int i = 0;
+  int sampleSec = this->sampleRate/1000;
+  int start = startMs * sampleSec;
+  int end = endMs*sampleSec;
+  while(i<start){
+    newWave->add_sample(this->get_sample(i++));
+  }
+  int ni = 0;
+  while(ni < base_file->lastSample){
+    newWave->add_sample(base_file->get_sample(ni++));
+  }
+  i = end;
   while(i<this->lastSample){
     newWave->add_sample(this->get_sample(i++));
   }

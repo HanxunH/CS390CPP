@@ -23,6 +23,7 @@ public:
 	double scaleNumber;
 	std::stack<WaveFile> Stack_redo;
 	std::stack<WaveFile> Stack_undo;
+	double drawScale;
 public:
 
 // Overrides
