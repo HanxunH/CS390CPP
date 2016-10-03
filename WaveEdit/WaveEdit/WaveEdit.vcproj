@@ -211,6 +211,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FilterVolumeDown.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterVolumeUp.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MainFrm.cpp"
 				>
 			</File>
@@ -278,6 +286,14 @@
 			</File>
 			<File
 				RelativePath=".\FilterSpeedup.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterVolumeDown.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FilterVolumeUp.h"
 				>
 			</File>
 			<File

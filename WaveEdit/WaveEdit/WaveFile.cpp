@@ -321,9 +321,12 @@ WaveFile::add_fragment(int startMs, WaveFile* base_file)
 }
 
 WaveFile *
-WaveFile::update_fragment(int startMs, int endMs, WaveFile* base_file)
+WaveFile::update_fragment(double scale, WaveFile* base_file)
 {
   WaveFile * newWave = new WaveFile(numChannels, sampleRate, bitsPerSample);
+  int i=0;
+  while(i<this->lastSample){
+    newWave->add_sample(this->get_sample(i++)*scale);
+  }
   return newWave;
-
 }
