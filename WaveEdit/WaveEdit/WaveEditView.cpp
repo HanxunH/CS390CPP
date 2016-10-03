@@ -159,11 +159,6 @@ CWaveEditView::OnInitialUpdate()
         sizeTotal.cx = 10000;
         sizeTotal.cy = 0;
         SetScrollSizes(MM_TEXT, sizeTotal);
-				CRect rect;
-				GetClientRect(rect);
-				CWaveEditDoc *pDoc = GetDocument();
-				WaveFile wave = pDoc->wave;
-				drawScale = wave.lastSample / rect.Width();
 }
 
 // CWaveEditView diagnostics
