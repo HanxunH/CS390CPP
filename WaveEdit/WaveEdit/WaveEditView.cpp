@@ -192,17 +192,15 @@ CWaveEditDoc* CWaveEditView::GetDocument() const // non-debug version is inline
 void CWaveEditView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	mousePressed = true;
-	CPoint scrollPos = GetDeviceScrollPosition();
-	selectionStart = point.x + scrollPos.x;
-	selectionEnd = point.x + scrollPos.x;
+	selectionStart = point.x +  GetDeviceScrollPosition().x;
+	selectionEnd = point.x +  GetDeviceScrollPosition().x;
 	CScrollView::OnLButtonDown(nFlags, point);
 }
 
 void CWaveEditView::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	mousePressed = false;
-	CPoint scrollPos = GetDeviceScrollPosition();
-	this->selectionEnd = point.x+scrollPos.x;
+	this->selectionEnd = point.x+ GetDeviceScrollPosition().x;
 	if(this->selectionEnd < this->selectionStart){
 		//swap
 		int temp = this->selectionEnd;
